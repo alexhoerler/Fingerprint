@@ -1,16 +1,10 @@
 import dpkt
-
-def main(argv):
-    pass
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
-
+import sys
 
 # get both the IP and TCP source and destination addresses
 # If the frame doesn't contain a IP or TCP packet, print so
 # packet_cap: a string name of the packet capture
-def get_eth_ip_tcp_head(packet_cap):
+def get_ip_tcp_head(packet_cap):
     file = open(packet_cap)
     pcap = dpkt.pcap.Reader(file)
     for timestamp, buf in pcap:
@@ -27,7 +21,7 @@ def get_eth_ip_tcp_head(packet_cap):
         #get the TCP level data
         tcp = ip.data
         if not isinstance(tcp, dpkt.tcp.TCP):
-            print("Not an instance. Can't extract data past the IP level.")
+            print("Not an instance of TCP. Can't extract data past the IP level.")
             continue
         else:
             print("TCP Packet: %s => %s" % (tcp.sport, tcp.dport))
@@ -44,3 +38,11 @@ def get_eth_head(packet_cap):
         print("Ethernet Frame: %s => %s" % (mac_addr(eth.src), mac_addr(eth.dst)))
 
     file.close()
+
+
+def main(argv):
+    for pcap in argv:
+        get_ip_tcp_head(pcap)
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
