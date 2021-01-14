@@ -63,18 +63,18 @@ def update_sessions(packet_cap):
 
                 # tracks and stores the ja3 and ja3s
                 if isinstance(ip_payload, dpkt.tcp.TCP):
-                    tls_packets = list()
+                    tls_packet = list()
                     try:
-                        tls_packets, bytes_used = dpkt.ssl.tls_multi_factory(ip_payload.data)
+                        tls_packet, bytes_used = dpkt.ssl.tls_multi_factory(ip_payload.data)
                     except dpkt.ssl.SSL3Exception:
                         continue
                     except dpkt.dpkt.NeedData:
                         continue
 
-                    if len(tls_packets) <= 0:
+                    if len(tls_packet) <= 0:
                         continue
 
-                    for tls_record in tls_packets:
+                    for tls_record in tls_packet:
                         if len(tls_record.data) == 0:
                             continue
                         hashed_ja3 = None
@@ -126,7 +126,7 @@ def tuple_to_key(tuple):
     """ Turns the 5 tuple of addresses into the key 5 tuple
     Makes sure that both outgoing and incoming packets have the same key
 
-    :param tuple: a 5 tuple of the protocol, and source and destination addresses for IP and TCP
+    :param tuple: a 5 tuple of the protocol, and source and destination addresses for IP and TCP/UDP
     :return: a 5 tuple key for the session dictionary
     """
 
@@ -299,8 +299,8 @@ def inet_to_str(inet):
 
 
 def get_all_head(packet_cap):
-    """ Get the ethernet, IP and TCP source and destination addresses
-    If the frame doesn't contain a IP or TCP packet, print so
+    """ Get the ethernet, IP and TCP/UDP source and destination addresses
+    If the frame doesn't contain a IP or TCP/UDP packet, print so
 
     :param packet_cap: a string name of the packet capture
     """
